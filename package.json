@@ -1,0 +1,30 @@
+{
+  "name": "@threedicons/core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/core/index.js",
+  "module": "./dist/core/index.js",
+  "types": "./dist/core/index.d.ts",
+  "files": ["dist/core", "README.md", "LICENSE"],
+  "exports": {
+    ".": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "check": "tsc --noEmit",
+    "build:core": "tsc -p tsconfig.build.json",
+    "build": "pnpm run check && pnpm run build:core && vite build",
+    "build:wrappers": "pnpm --filter @threedicons/react build && pnpm --filter @threedicons/vue build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.3",
+    "react": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vue": "^3.5.13"
+  }
+}
