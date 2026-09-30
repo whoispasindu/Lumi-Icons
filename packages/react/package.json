@@ -1,7 +1,7 @@
 {
-  "name": "@threedicons/react",
+  "name": "@lumi-icons/react",
   "version": "0.1.0",
-  "description": "React bindings for threedicons Web Components",
+  "description": "React bindings for Lumi Icons Web Components",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,11 +16,11 @@
     "build": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "@threedicons/core": "^0.1.0",
+    "@lumi-icons/core": "^0.1.0",
     "react": ">=18.0.0"
   },
   "devDependencies": {
-    "@threedicons/core": "workspace:*",
+    "@lumi-icons/core": "workspace:*",
     "@types/react": "^19.0.3",
     "react": "^19.0.0",
     "typescript": "^5.7.2"

@@ -1,8 +1,8 @@
-# @threedicons/vue
+# @lumi-icons/vue
 
 ```vue
 <script setup lang="ts">
-import { ThreeIcon } from "@threedicons/vue";
+import { ThreeIcon } from "@lumi-icons/vue";
 </script>
 
 <template>
@@ -10,4 +10,4 @@ import { ThreeIcon } from "@threedicons/vue";
 </template>
 ```
 
-This wrapper delegates icon registration, SVG rendering, and motion to `@threedicons/core`.
+This wrapper delegates icon registration, SVG rendering, and motion to `@lumi-icons/core`.

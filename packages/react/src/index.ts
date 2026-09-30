@@ -1,7 +1,7 @@
-import "@threedicons/core";
+import "@lumi-icons/core";
 import { createElement, forwardRef } from "react";
 import type { HTMLAttributes, Ref } from "react";
-import type { IconAnimation, IconName, MotionPreference } from "@threedicons/core";
+import type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";
 
 export interface ThreeIconProps extends Omit<HTMLAttributes<HTMLElement>, "color"> {
   name: IconName;
@@ -29,4 +29,4 @@ export const ThreeIcon = forwardRef(function ThreeIcon(
   });
 });
 
-export type { IconAnimation, IconName, MotionPreference } from "@threedicons/core";
+export type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";

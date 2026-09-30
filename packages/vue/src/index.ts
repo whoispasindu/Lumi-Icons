@@ -1,7 +1,7 @@
-import "@threedicons/core";
+import "@lumi-icons/core";
 import { defineComponent, h } from "vue";
 import type { PropType } from "vue";
-import type { IconAnimation, IconName, MotionPreference } from "@threedicons/core";
+import type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";
 
 export const ThreeIcon = defineComponent({
   name: "ThreeIcon",
@@ -19,4 +19,4 @@ export const ThreeIcon = defineComponent({
   },
 });
 
-export type { IconAnimation, IconName, MotionPreference } from "@threedicons/core";
+export type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";

@@ -1,7 +1,7 @@
 {
-  "name": "@threedicons/vue",
+  "name": "@lumi-icons/vue",
   "version": "0.1.0",
-  "description": "Vue bindings for threedicons Web Components",
+  "description": "Vue bindings for Lumi Icons Web Components",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,11 +16,11 @@
     "build": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "@threedicons/core": "^0.1.0",
+    "@lumi-icons/core": "^0.1.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {
-    "@threedicons/core": "workspace:*",
+    "@lumi-icons/core": "workspace:*",
     "typescript": "^5.7.2",
     "vue": "^3.5.13"
   }

@@ -1,5 +1,5 @@
 {
-  "name": "@threedicons/core",
+  "name": "@lumi-icons/core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/core/index.js",
@@ -17,7 +17,7 @@
     "check": "tsc --noEmit",
     "build:core": "tsc -p tsconfig.build.json",
     "build": "pnpm run check && pnpm run build:core && vite build",
-    "build:wrappers": "pnpm --filter @threedicons/react build && pnpm --filter @threedicons/vue build",
+    "build:wrappers": "pnpm --filter @lumi-icons/react build && pnpm --filter @lumi-icons/vue build",
     "preview": "vite preview"
   },
   "devDependencies": {
