@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
+      - run: pnpm run test
+      - run: pnpm run build
+      - run: pnpm run build:wrappers
+      # The published ESM must load in Node without a bundler (catches extensionless imports).
+      - run: node -e "import('./dist/core/index.js').then((m) => { if (m.iconNames.length < 1 || !m.icons[m.iconNames[0]].svg) process.exit(1); })"

@@ -1,7 +1,7 @@
-export { icons } from "./icons";
-export { defineThreeIcons, ThreeIcon } from "./three-icon";
-export { iconNames } from "./types";
-export type { IconAnimation, IconDefinition, IconName, MotionPreference } from "./types";
+export { icons } from "./icons.js";
+export { defineLumiIcons, LumiIcon, resolveIconName, tagName } from "./lumi-icon.js";
+export { iconAliases, iconAnimations, iconCategories, iconNames } from "./types.js";
+export type { IconAlias, IconAnimation, IconCategory, IconDefinition, IconName, MotionPreference } from "./types.js";
 
-import { defineThreeIcons } from "./three-icon";
-defineThreeIcons();
+import { defineLumiIcons } from "./lumi-icon.js";
+defineLumiIcons();

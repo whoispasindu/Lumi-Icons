@@ -3,11 +3,270 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f8fc" />
-    <title>Lumi Icons Playground</title>
+    <meta name="description" content="Lumi Icons: animated, lightweight 3D icons delivered as one framework-independent Web Component." />
+    <meta name="theme-color" content="#f6f6fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0e15" media="(prefers-color-scheme: dark)" />
+    <title>Lumi Icons</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      try { const t = localStorage.getItem("lumi-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+    </script>
   </head>
   <body>
-    <app-playground></app-playground>
+    <a class="skip" href="#icons">Skip to icons</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="wordmark" href="#top" aria-label="Lumi Icons home">
+          <lumi-icon name="cube" size="26"></lumi-icon>
+          <span>Lumi <b>Icons</b></span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+          <a href="#icons">Icons</a>
+          <a href="#usage">Usage</a>
+          <a href="https://github.com/whoispasindu/Lumi-Icons" target="_blank" rel="noopener">GitHub</a>
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle dark mode">
+            <lumi-icon name="moon" size="20" data-theme-icon></lumi-icon>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero container">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot"></span>Open source · MIT · Zero dependencies</p>
+          <h1>Icons with depth that move with your interface.</h1>
+          <p class="lede"><span data-icon-count>427</span> animated 3D icons in one tiny Web Component. Theme them with a single color, drop them into HTML, React, or Vue, and they respect reduced-motion out of the box.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#icons">Browse icons <lumi-icon name="arrowRight" size="18"></lumi-icon></a>
+            <button class="install" type="button" data-copy="npm i @lumi-icons/core" aria-label="Copy install command">
+              <code><span class="prompt">$</span> npm i @lumi-icons/core</code>
+              <lumi-icon name="copy" size="18"></lumi-icon>
+            </button>
+          </div>
+          <dl class="stats">
+            <div><dt>Icons</dt><dd data-icon-count>427</dd></div>
+            <div><dt>Categories</dt><dd data-category-count>23</dd></div>
+            <div><dt>Motions</dt><dd>7</dd></div>
+            <div><dt>Gzipped</dt><dd>~29 KB</dd></div>
+          </dl>
+        </div>
+        <div class="hero-stage" aria-hidden="true">
+          <lumi-icon class="float-a" name="rocket" size="132" color="#6a4dd8" animation="launch"></lumi-icon>
+          <lumi-icon class="float-b" name="bell" size="76" color="#ef6b4a" animation="ring"></lumi-icon>
+          <lumi-icon class="float-c" name="heart" size="64" color="#e2458a" animation="pulse"></lumi-icon>
+          <lumi-icon class="float-d" name="settings" size="70" color="#10a37f" animation="spin"></lumi-icon>
+          <lumi-icon class="float-e" name="star" size="58" color="#e9a23b" animation="sparkle"></lumi-icon>
+          <lumi-icon class="float-f" name="cube" size="84" color="#2f7de1" animation="tilt"></lumi-icon>
+          <lumi-icon class="float-g" name="chat" size="56" color="#6a4dd8" animation="float"></lumi-icon>
+        </div>
+      </section>
+
+      <section class="explorer container" id="icons" aria-label="Icon explorer" data-explorer>
+        <aside class="sidebar">
+          <section class="panel customizer" data-customizer>
+            <div class="panel-head">
+              <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="customizer-body" data-customizer-toggle>
+                <lumi-icon name="sliders" size="20"></lumi-icon>
+                <span class="panel-title">Customize</span>
+                <lumi-icon class="toggle-chevron" name="chevronDown" size="18"></lumi-icon>
+              </button>
+              <button class="text-button" type="button" data-reset>
+                <lumi-icon name="refresh" size="16"></lumi-icon> Reset
+              </button>
+            </div>
+            <div class="panel-body" id="customizer-body">
+              <div class="field">
+                <span class="field-label">Color</span>
+                <div class="swatches" role="group" aria-label="Color" data-swatches>
+                  <label class="custom-color" title="Custom color">
+                    <input type="color" data-color aria-label="Custom color" />
+                  </label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <label class="field-label" for="size-range">Size</label>
+                  <output data-size-output for="size-range"></output>
+                </div>
+                <input id="size-range" type="range" min="16" max="64" step="4" data-size />
+              </div>
+              <div class="field">
+                <span class="field-label">Motion</span>
+                <div class="motion-chips" role="group" aria-label="Animation" data-animations="customizer"></div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" data-reduced />
+                <span class="track"><span class="thumb"></span></span>
+                <span>Reduced motion</span>
+              </label>
+            </div>
+          </section>
+
+          <nav class="panel categories-nav" aria-label="Categories">
+            <p class="panel-title">Categories</p>
+            <ul data-category-nav></ul>
+          </nav>
+        </aside>
+
+        <div class="explorer-main">
+          <div class="searchbar">
+            <label class="search">
+              <lumi-icon name="search" size="20"></lumi-icon>
+              <span class="visually-hidden">Search icons</span>
+              <input type="search" placeholder="Search icons…" autocomplete="off" spellcheck="false" data-search />
+              <button class="clear-search" type="button" aria-label="Clear search" data-clear-search hidden>
+                <lumi-icon name="close" size="16"></lumi-icon>
+              </button>
+              <kbd data-shortcut>/</kbd>
+            </label>
+          </div>
+
+          <div data-browse>
+            <section class="group" aria-labelledby="popular-title">
+              <header class="group-head">
+                <div>
+                  <h2 id="popular-title">Popular</h2>
+                  <p>The icons most interfaces reach for first. Click any icon for details and code.</p>
+                </div>
+              </header>
+              <div class="grid" data-featured></div>
+            </section>
+
+            <section class="group" aria-labelledby="categories-title">
+              <header class="group-head">
+                <div>
+                  <h2 id="categories-title">Browse by category</h2>
+                  <p><span data-icon-count>427</span> icons in <span data-category-count>23</span> categories.</p>
+                </div>
+                <button class="button ghost small" type="button" data-toggle-all>Expand all</button>
+              </header>
+              <div class="category-list" data-category-list></div>
+            </section>
+          </div>
+
+          <section class="group" data-results hidden aria-labelledby="results-title">
+            <header class="group-head">
+              <div>
+                <h2 id="results-title">Results</h2>
+                <p data-result-count aria-live="polite"></p>
+              </div>
+            </header>
+            <div class="grid" data-results-grid></div>
+            <div class="empty" data-empty hidden>
+              <lumi-icon name="search" size="56"></lumi-icon>
+              <p>No icons match “<span data-empty-query></span>”.</p>
+              <p class="hint">Try a broader word, like <button class="link-button" type="button" data-suggest="arrow">arrow</button>, <button class="link-button" type="button" data-suggest="money">money</button>, or <button class="link-button" type="button" data-suggest="user">user</button>.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="usage container" id="usage" aria-labelledby="usage-title">
+        <p class="eyebrow">Usage</p>
+        <h2 id="usage-title">One element, every framework.</h2>
+        <div class="usage-grid">
+          <article class="usage-card">
+            <h3><lumi-icon name="globe" size="22"></lumi-icon> HTML / CDN</h3>
+            <pre><code>&lt;script type="module"
+  src="https://cdn.jsdelivr.net/npm/@lumi-icons/core/+esm"&gt;&lt;/script&gt;
+
+&lt;lumi-icon name="rocket" animation="launch"&gt;&lt;/lumi-icon&gt;</code></pre>
+          </article>
+          <article class="usage-card">
+            <h3><lumi-icon name="code" size="22"></lumi-icon> React</h3>
+            <pre><code>npm i @lumi-icons/core @lumi-icons/react
+
+import { LumiIcon } from "@lumi-icons/react";
+
+&lt;LumiIcon name="rocket" size={40} /&gt;</code></pre>
+          </article>
+          <article class="usage-card">
+            <h3><lumi-icon name="leaf" size="22"></lumi-icon> Vue</h3>
+            <pre><code>npm i @lumi-icons/core @lumi-icons/vue
+
+import { LumiIcon } from "@lumi-icons/vue";
+
+&lt;LumiIcon name="rocket" :size="40" /&gt;</code></pre>
+          </article>
+        </div>
+        <div class="api">
+          <table>
+            <thead><tr><th scope="col">Attribute</th><th scope="col">Values</th><th scope="col">Default</th></tr></thead>
+            <tbody>
+              <tr><td><code>name</code></td><td>Any icon name from the catalog (aliases like <code>x</code> work too)</td><td>—</td></tr>
+              <tr><td><code>size</code></td><td>Pixels (<code>48</code>) or a CSS length (<code>2em</code>). Also settable with <code>--lumi-icon-size</code></td><td><code>24px</code></td></tr>
+              <tr><td><code>color</code></td><td>Any CSS color. Omit it to inherit <code>currentColor</code></td><td><code>currentColor</code></td></tr>
+              <tr><td><code>animation</code></td><td><code>float</code> <code>spin</code> <code>pulse</code> <code>ring</code> <code>launch</code> <code>sparkle</code> <code>tilt</code></td><td><code>none</code></td></tr>
+              <tr><td><code>motion</code></td><td><code>auto</code> follows the OS setting, <code>reduced</code> always holds still</td><td><code>auto</code></td></tr>
+              <tr><td><code>label</code></td><td>Accessible name. Without it the icon is decorative</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>MIT licensed · Built for the open web</span>
+        <a href="https://github.com/whoispasindu/Lumi-Icons" target="_blank" rel="noopener">github.com/whoispasindu/Lumi-Icons</a>
+      </div>
+    </footer>
+
+    <dialog class="drawer" aria-labelledby="drawer-title" data-drawer>
+      <div class="drawer-inner">
+        <header class="drawer-head">
+          <div>
+            <p class="eyebrow" data-d-category></p>
+            <h2 id="drawer-title" data-d-label></h2>
+            <button class="name-chip" type="button" data-copy-name title="Copy name"><code data-d-name></code><lumi-icon name="copy" size="14"></lumi-icon></button>
+          </div>
+          <div class="drawer-nav">
+            <button class="icon-button" type="button" data-d-prev aria-label="Previous icon"><lumi-icon name="chevronLeft" size="18"></lumi-icon></button>
+            <button class="icon-button" type="button" data-d-next aria-label="Next icon"><lumi-icon name="chevronRight" size="18"></lumi-icon></button>
+            <button class="icon-button" type="button" data-d-close aria-label="Close"><lumi-icon name="close" size="18"></lumi-icon></button>
+          </div>
+        </header>
+
+        <div class="stage" data-stage-view>
+          <lumi-icon data-preview size="150"></lumi-icon>
+          <div class="segmented stage-toggle" role="group" aria-label="Preview background">
+            <button type="button" data-stage="light" aria-label="Light background"><span class="swatch-light"></span></button>
+            <button type="button" data-stage="dark" aria-label="Dark background"><span class="swatch-dark"></span></button>
+            <button type="button" data-stage="tint" aria-label="Tinted background"><span class="swatch-tint"></span></button>
+          </div>
+        </div>
+
+        <div class="ladder" aria-label="Actual sizes" data-ladder></div>
+
+        <div class="field">
+          <span class="field-label">Motion</span>
+          <div class="motion-chips" role="group" aria-label="Animation" data-animations="drawer"></div>
+        </div>
+
+        <div class="tags" data-d-tags></div>
+
+        <div class="drawer-actions">
+          <button class="button ghost small" type="button" data-copy-svg><lumi-icon name="copy" size="16"></lumi-icon> Copy SVG</button>
+          <button class="button ghost small" type="button" data-download-svg><lumi-icon name="download" size="16"></lumi-icon> Download SVG</button>
+        </div>
+
+        <div class="code-card">
+          <div class="code-tabs" role="tablist" aria-label="Snippet format" data-code-tabs>
+            <button type="button" role="tab" data-tab="html">HTML</button>
+            <button type="button" role="tab" data-tab="react">React</button>
+            <button type="button" role="tab" data-tab="vue">Vue</button>
+            <button class="copy" type="button" data-copy-code>
+              <lumi-icon name="copy" size="16"></lumi-icon><span>Copy</span>
+            </button>
+          </div>
+          <pre role="tabpanel"><code data-code></code></pre>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
     <script type="module" src="/playground/main.ts"></script>
   </body>
 </html>

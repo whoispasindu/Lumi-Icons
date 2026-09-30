@@ -1,27 +1,29 @@
 import "@lumi-icons/core";
 import { createElement, forwardRef } from "react";
 import type { HTMLAttributes, Ref } from "react";
-import type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";
+import type { IconAlias, IconAnimation, IconName, LumiIcon as LumiIconElement, MotionPreference } from "@lumi-icons/core";
 
-export interface ThreeIconProps extends Omit<HTMLAttributes<HTMLElement>, "color"> {
-  name: IconName;
-  size?: number;
+export interface LumiIconProps extends Omit<HTMLAttributes<HTMLElement>, "color"> {
+  name: IconName | IconAlias;
+  /** Pixels as a number, or any CSS length such as "1.5em". */
+  size?: number | string;
   color?: string;
   animation?: IconAnimation;
   motion?: MotionPreference;
+  /** Accessible name. Without it the icon is decorative and hidden from assistive technology. */
   label?: string;
 }
 
-/** React binding for the framework-independent <three-icon> element. */
-export const ThreeIcon = forwardRef(function ThreeIcon(
-  { name, size, color, animation, motion, label, ...htmlProps }: ThreeIconProps,
-  ref: Ref<HTMLElement>,
+/** React binding for the framework-independent <lumi-icon> element. */
+export const LumiIcon = forwardRef(function LumiIcon(
+  { name, size, color, animation, motion, label, ...htmlProps }: LumiIconProps,
+  ref: Ref<LumiIconElement>,
 ) {
-  return createElement("three-icon", {
+  return createElement("lumi-icon", {
     ...htmlProps,
     ref,
     name,
-    ...(size !== undefined ? { size } : {}),
+    ...(size !== undefined ? { size: String(size) } : {}),
     ...(color !== undefined ? { color } : {}),
     ...(animation !== undefined ? { animation } : {}),
     ...(motion !== undefined ? { motion } : {}),
@@ -29,4 +31,4 @@ export const ThreeIcon = forwardRef(function ThreeIcon(
   });
 });
 
-export type { IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";
+export type { IconAlias, IconAnimation, IconName, MotionPreference } from "@lumi-icons/core";
