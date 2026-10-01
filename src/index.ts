@@ -1,7 +1,7 @@
-export { icons } from "./icons.js";
-export { defineLumiIcons, LumiIcon, resolveIconName, tagName } from "./lumi-icon.js";
-export { iconAliases, iconAnimations, iconCategories, iconNames } from "./types.js";
-export type { IconAlias, IconAnimation, IconCategory, IconDefinition, IconName, MotionPreference } from "./types.js";
+// "@lumi-icons/core": zero-config. Registers every icon, then defines <lumi-icon>.
+// For a smaller bundle, use "@lumi-icons/core/element" with icons from "@lumi-icons/core/icons".
+import "./all.js";
 
-import { defineLumiIcons } from "./lumi-icon.js";
-defineLumiIcons();
+export * from "./element.js";
+export * from "./catalog.js";
+export { icons, iconNames } from "./icons.js";

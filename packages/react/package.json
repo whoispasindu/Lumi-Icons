@@ -2,14 +2,39 @@
   "name": "@lumi-icons/react",
   "version": "0.1.0",
   "description": "React bindings for Lumi Icons Web Components",
+  "keywords": [
+    "icons",
+    "3d-icons",
+    "animated-icons",
+    "lumi-icons",
+    "react"
+  ],
+  "license": "MIT",
+  "author": "whoispasindu",
+  "homepage": "https://github.com/whoispasindu/Lumi-Icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whoispasindu/Lumi-Icons.git",
+    "directory": "packages/react"
+  },
+  "bugs": "https://github.com/whoispasindu/Lumi-Icons/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "lean",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
+    },
+    "./lean": {
+      "types": "./dist/lean.d.ts",
+      "default": "./dist/lean.js"
     }
   },
   "scripts": {
@@ -24,5 +49,8 @@
     "@types/react": "^19.0.3",
     "react": "^19.0.0",
     "typescript": "^5.7.2"
-  }
+  },
+  "sideEffects": [
+    "./dist/index.js"
+  ]
 }

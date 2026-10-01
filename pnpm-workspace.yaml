@@ -1,4 +1,6 @@
 allowBuilds:
   esbuild: true
+  # Optional native file watcher pulled in by ng-packagr's Sass; prebuilt binaries cover it.
+  "@parcel/watcher": false
 packages:
   - packages/*

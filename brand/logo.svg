@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Lumi Icons">
+  <defs>
+    <linearGradient id="lumi-tile" x1="10" y1="4" x2="54" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8d71f6"/>
+      <stop offset="1" stop-color="#4f31c2"/>
+    </linearGradient>
+    <radialGradient id="lumi-shine" cx="16" cy="8" r="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lumi-glow" cx="43" cy="22" r="13" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd76a" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Tile -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lumi-tile)"/>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lumi-shine)"/>
+  <!-- Cast shadow, as under every Lumi icon -->
+  <ellipse cx="35" cy="50.5" rx="15" ry="2.4" fill="#26127a" opacity=".32"/>
+  <!-- Extruded side face: the letter stamped along the same down-right depth the icons use -->
+  <g fill="none" stroke="#cbbfff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 18v24h18" transform="translate(3.2 4)"/>
+    <path d="M23 18v24h18" transform="translate(2.4 3)"/>
+    <path d="M23 18v24h18" transform="translate(1.6 2)"/>
+    <path d="M23 18v24h18" transform="translate(.8 1)"/>
+  </g>
+  <!-- Front face -->
+  <path d="M23 18v24h18" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- The light -->
+  <circle cx="43" cy="22" r="13" fill="url(#lumi-glow)"/>
+  <path d="M43 15c.8 4.3 2.7 6.2 7 7-4.3.8-6.2 2.7-7 7-.8-4.3-2.7-6.2-7-7 4.3-.8 6.2-2.7 7-7Z" fill="#ffd76a"/>
+  <circle cx="51.5" cy="12.5" r="1.7" fill="#ffe7a3"/>
+</svg>

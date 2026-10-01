@@ -25,16 +25,28 @@
   "types": "./dist/core/index.d.ts",
   "files": [
     "dist/core",
+    "element",
+    "icons",
     "README.md",
     "LICENSE"
   ],
   "sideEffects": [
-    "./dist/core/index.js"
+    "./dist/core/index.js",
+    "./dist/core/all.js",
+    "./dist/core/element.js"
   ],
   "exports": {
     ".": {
       "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js"
+      "default": "./dist/core/index.js"
+    },
+    "./element": {
+      "types": "./dist/core/element.d.ts",
+      "default": "./dist/core/element.js"
+    },
+    "./icons": {
+      "types": "./dist/core/catalog.d.ts",
+      "default": "./dist/core/catalog.js"
     },
     "./package.json": "./package.json"
   },
@@ -44,9 +56,11 @@
     "test": "vitest run",
     "build:core": "tsc -p tsconfig.build.json",
     "build": "pnpm run check && pnpm run build:core && vite build",
-    "build:wrappers": "pnpm --filter @lumi-icons/react build && pnpm --filter @lumi-icons/vue build",
+    "build:wrappers": "pnpm --filter @lumi-icons/react --filter @lumi-icons/vue --filter @lumi-icons/angular --filter @lumi-icons/react-native run build",
     "preview": "vite preview",
-    "prepublishOnly": "pnpm run check && pnpm run test && pnpm run build:core"
+    "prepublishOnly": "pnpm run check && pnpm run test && pnpm run build:core",
+    "test:angular": "pnpm --filter @lumi-icons/angular test",
+    "test:dist": "vitest run --config vitest.dist.config.ts"
   },
   "devDependencies": {
     "happy-dom": "^20.14.5",

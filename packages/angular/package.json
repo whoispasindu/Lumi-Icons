@@ -1,0 +1,49 @@
+{
+  "name": "@lumi-icons/angular",
+  "version": "0.1.0",
+  "description": "Angular bindings for Lumi Icons Web Components",
+  "keywords": [
+    "icons",
+    "3d-icons",
+    "animated-icons",
+    "lumi-icons",
+    "angular"
+  ],
+  "license": "MIT",
+  "author": "whoispasindu",
+  "homepage": "https://github.com/whoispasindu/Lumi-Icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whoispasindu/Lumi-Icons.git",
+    "directory": "packages/angular"
+  },
+  "bugs": "https://github.com/whoispasindu/Lumi-Icons/issues",
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.json",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17.1.0",
+    "@lumi-icons/core": "^0.1.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@lumi-icons/core": "workspace:*",
+    "ng-packagr": "22.2.2",
+    "rxjs": "^7.8.0",
+    "typescript": "~6.0.0"
+  },
+  "sideEffects": [
+    "./fesm2022/lumi-icons-angular.mjs"
+  ],
+  "publishConfig": {
+    "directory": "dist"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "@lumi-icons/react-native",
+  "version": "0.1.0",
+  "description": "Lumi's animated 3D icons for React Native, rendered with react-native-svg",
+  "keywords": [
+    "icons",
+    "3d-icons",
+    "animated-icons",
+    "lumi-icons",
+    "react-native",
+    "react-native-svg"
+  ],
+  "license": "MIT",
+  "author": "whoispasindu",
+  "homepage": "https://github.com/whoispasindu/Lumi-Icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whoispasindu/Lumi-Icons.git",
+    "directory": "packages/react-native"
+  },
+  "bugs": "https://github.com/whoispasindu/Lumi-Icons/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "react-native": "./dist/index.js",
+  "files": [
+    "dist",
+    "lean",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./lean": {
+      "types": "./dist/lean.d.ts",
+      "default": "./dist/lean.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@lumi-icons/core": "^0.1.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.73.0",
+    "react-native-svg": ">=13.0.0"
+  },
+  "devDependencies": {
+    "@lumi-icons/core": "workspace:*",
+    "@types/react": "^19.1.1",
+    "react": "^19.2.3",
+    "react-native": "^0.87.1",
+    "react-native-svg": "^15.15.5",
+    "typescript": "^5.7.2"
+  },
+  "sideEffects": [
+    "./dist/index.js"
+  ]
+}

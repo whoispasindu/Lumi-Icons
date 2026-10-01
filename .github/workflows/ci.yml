@@ -5,13 +5,25 @@ on:
     branches: [master]
   pull_request:
 
+# Read-only token: CI never needs to write to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      # Actions are pinned to commit SHAs so a moved or compromised tag cannot change what runs.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: pnpm
@@ -19,6 +31,11 @@ jobs:
       - run: pnpm run check
       - run: pnpm run test
       - run: pnpm run build
+      # Real Vite/Rollup bundles of the built package: tree-shaking works and zero-config ships everything.
+      - run: pnpm run test:dist
       - run: pnpm run build:wrappers
+      # Boots a real Angular app against the built @lumi-icons/angular package.
+      - run: pnpm run test:angular
       # The published ESM must load in Node without a bundler (catches extensionless imports).
       - run: node -e "import('./dist/core/index.js').then((m) => { if (m.iconNames.length < 1 || !m.icons[m.iconNames[0]].svg) process.exit(1); })"
+      - run: node -e "Promise.all([import('@lumi-icons/core/element'), import('@lumi-icons/core/icons')]).then(([e, i]) => { e.registerIcons(i.rocketIcon); if (e.getIcon('rocket') !== i.rocketIcon) process.exit(1); })"

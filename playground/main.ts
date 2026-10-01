@@ -1,9 +1,9 @@
-import { icons, resolveIconName } from "../src";
-import { iconAnimations, iconCategories, iconNames, type IconAnimation, type IconCategory, type IconName } from "../src/types";
+import { iconNames, icons, resolveIconName } from "../src";
+import { iconAnimations, iconCategories, type IconAnimation, type IconCategory, type IconName } from "../src/types";
 import "./style.css";
 
 type Stage = "light" | "dark" | "tint";
-type CodeTab = "html" | "react" | "vue";
+type CodeTab = "html" | "react" | "vue" | "angular" | "react-native";
 
 const swatches = [
   { color: "#6a4dd8", name: "Violet" },
@@ -75,6 +75,7 @@ const state = {
   selected: null as IconName | null,
   stage: (isDark() ? "dark" : "light") as Stage,
   tab: "html" as CodeTab,
+  lean: false,
   query: "",
 };
 
@@ -392,7 +393,14 @@ function onDrawerClosed() {
   if (state.selected === null) return;
   state.selected = null;
   history.replaceState(null, "", location.pathname + location.search);
-  returnFocus?.focus();
+  if (returnFocus) {
+    returnFocus.focus();
+  } else {
+    // No sensible return target (e.g. opened from the decorative hero): never leave focus inside
+    // the closed dialog or the aria-hidden hero, where the browser may otherwise restore it.
+    const active = document.activeElement as HTMLElement | null;
+    if (active && (drawer.contains(active) || active.closest("[data-hero]"))) active.blur();
+  }
 }
 function closeDrawer() {
   if (drawer.open) drawer.close();
@@ -442,31 +450,69 @@ $("[data-download-svg]").addEventListener("click", () => {
   showToast(`Downloaded ${kebab(state.selected)}.svg`);
 });
 $("[data-copy-name]").addEventListener("click", () => state.selected && copy(state.selected, "icon name"));
-$("[data-copy-code]").addEventListener("click", () => copy(snippet(), `${state.tab === "html" ? "HTML" : titleCase(state.tab)} snippet`));
+const tabNames: Record<CodeTab, string> = { html: "HTML", react: "React", vue: "Vue", angular: "Angular", "react-native": "React Native" };
+$("[data-copy-code]").addEventListener("click", () => copy(snippet(), `${tabNames[state.tab]} snippet`));
+
+const leanInput = $<HTMLInputElement>("[data-lean]");
+leanInput.addEventListener("change", () => { state.lean = leanInput.checked; update(); });
+
+/** The icon's export in "@lumi-icons/core/icons", e.g. "rocket" → "rocketIcon". */
+const exportName = (name: string) => `${name}Icon`;
 
 function snippet() {
-  const { selected, animation, color, size, reduced, tab } = state;
-  const attrs: [string, string | number][] = [["name", selected ?? "rocket"], ["size", size], ["color", color]];
+  const { selected, animation, color, size, reduced, tab, lean } = state;
+  const name = selected ?? "rocket";
+  const icon = exportName(name);
+  // "Only this icon" swaps the name for the icon definition, so bundlers keep just this icon.
+  const attrs: [string, string | number | { ref: string }][] = [
+    lean && tab !== "html" ? ["icon", { ref: tab === "angular" ? "icon" : icon }] : ["name", name],
+    ["size", size],
+    ["color", color],
+  ];
   if (animation !== "none") attrs.push(["animation", animation]);
   if (reduced) attrs.push(["motion", "reduced"]);
-  const format = ([key, value]: [string, string | number]) => {
-    if (typeof value === "number" && tab === "react") return `${key}={${value}}`;
-    if (typeof value === "number" && tab === "vue") return `:${key}="${value}"`;
-    return `${key}="${value}"`;
+  const format = ([key, value]: [string, string | number | { ref: string }]) => {
+    const expression = typeof value === "object" ? value.ref : typeof value === "number" ? String(value) : undefined;
+    if (expression === undefined) return `${key}="${value}"`;
+    if (tab === "react" || tab === "react-native") return `${key}={${expression}}`;
+    if (tab === "vue") return `:${key}="${expression}"`;
+    if (tab === "angular") return `[${key}]="${expression}"`;
+    return `${key}="${expression}"`;
   };
   const body = attrs.map(format).join(" ");
-  return tab === "html" ? `<lumi-icon ${body}></lumi-icon>` : `<LumiIcon ${body} />`;
+  const element = tab === "html" ? `<lumi-icon ${body}></lumi-icon>` : tab === "angular" ? `<lumi-icon ${body} />` : `<LumiIcon ${body} />`;
+  if (!lean) return element;
+
+  const fromIcons = `import { ${icon} } from "@lumi-icons/core/icons";`;
+  switch (tab) {
+    case "html":
+      return `<script type="module">\n  import { registerIcons } from "@lumi-icons/core/element";\n  ${fromIcons}\n  registerIcons(${icon});\n</script>\n\n${element}`;
+    case "react":
+      return `import { LumiIcon } from "@lumi-icons/react/lean";\n${fromIcons}\n\n${element}`;
+    case "react-native":
+      return `import { LumiIcon } from "@lumi-icons/react-native/lean";\n${fromIcons}\n\n${element}`;
+    case "vue":
+      return `<script setup lang="ts">\nimport { LumiIcon } from "@lumi-icons/vue/lean";\n${fromIcons}\n</script>\n\n${element}`;
+    case "angular":
+      return `import { LumiIconComponent } from "@lumi-icons/angular/lean";\n${fromIcons}\n\n// In the component: imports: [LumiIconComponent], icon = ${icon};\n${element}`;
+  }
 }
 
 /** Renders the snippet as highlighted DOM nodes (textContent only, no markup parsing). */
 function renderCode() {
   code.replaceChildren();
-  const pattern = /(<\/?[\w-]+|\/?>)|([:\w-]+)(=)("[^"]*"|\{[^}]*\})|(\s+)/g;
-  for (const match of snippet().matchAll(pattern)) {
+  const text = snippet();
+  // Attribute names may be bound: :size (Vue) or [size] (Angular).
+  const pattern = /(<\/?[\w-]+|\/?>)|([:\w\-[\]]+)(=)("[^"]*"|\{[^}]*\})/g;
+  let last = 0;
+  for (const match of text.matchAll(pattern)) {
+    // Keep anything between tokens verbatim, so nothing the pattern misses is ever dropped.
+    code.append(text.slice(last, match.index));
     if (match[1]) code.append(el("span", { className: "tok-tag", textContent: match[1] }));
-    else if (match[2]) code.append(el("span", { className: "tok-attr", textContent: match[2] }), match[3], el("span", { className: "tok-value", textContent: match[4] }));
-    else code.append(match[5] ?? "");
+    else code.append(el("span", { className: "tok-attr", textContent: match[2] }), match[3], el("span", { className: "tok-value", textContent: match[4] }));
+    last = match.index + match[0].length;
   }
+  code.append(text.slice(last));
 }
 
 function renderDrawer(name: IconName) {
@@ -507,6 +553,7 @@ function update() {
   sizeInput.value = String(state.size);
   sizeOutput.textContent = `${state.size}px`;
   reducedInput.checked = state.reduced;
+  leanInput.checked = state.lean;
   animationButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.animation === state.animation)));
   if (state.selected) renderDrawer(state.selected);
   save();
@@ -517,8 +564,271 @@ syncToggleAll();
 
 // A link like /#heart opens that icon's details.
 function openFromHash() {
-  const name = resolveIconName(decodeURIComponent(location.hash.slice(1)));
+  let requested: string;
+  try {
+    requested = decodeURIComponent(location.hash.slice(1));
+  } catch {
+    return; // A malformed link such as /#%E0 must not stop the rest of the page from loading.
+  }
+  const name = resolveIconName(requested) as IconName | undefined;
   if (name && name !== state.selected) openDrawer(name);
 }
 openFromHash();
 window.addEventListener("hashchange", openFromHash);
+
+/* ---------- Platforms ---------- */
+
+interface Platform {
+  id: string;
+  name: string;
+  icon: IconName;
+  /** Accent for the platform's chip and tab. */
+  color: string;
+  note: string;
+  install: string;
+  file: string;
+  code: string;
+}
+
+const platforms: Platform[] = [
+  {
+    id: "html", name: "HTML", icon: "code", color: "#e34c26",
+    note: "Any page, no build step: load the Web Component from a CDN (or install it for your bundler).",
+    install: "npm i @lumi-icons/core", file: "index.html",
+    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/@lumi-icons/core/+esm"></script>
+
+<lumi-icon name="rocket" size="48" animation="launch"></lumi-icon>`,
+  },
+  {
+    id: "react", name: "React", icon: "atom", color: "#149eca",
+    note: "A typed component with ref forwarding. Safe to import during server-side rendering (Next.js, Remix).",
+    install: "npm i @lumi-icons/core @lumi-icons/react", file: "Launch.tsx",
+    code: `import { LumiIcon } from "@lumi-icons/react";
+
+export function Launch() {
+  return <LumiIcon name="rocket" size={48} animation="launch" />;
+}`,
+  },
+  {
+    id: "vue", name: "Vue", icon: "leaf", color: "#42b883",
+    note: "A Vue 3 component with typed props. Safe for SSR (Nuxt).",
+    install: "npm i @lumi-icons/core @lumi-icons/vue", file: "Launch.vue",
+    code: `<script setup lang="ts">
+import { LumiIcon } from "@lumi-icons/vue";
+</script>
+
+<template>
+  <LumiIcon name="rocket" :size="48" animation="launch" />
+</template>`,
+  },
+  {
+    id: "angular", name: "Angular", icon: "shield", color: "#dd0031",
+    note: "A standalone component with typed signal inputs. No CUSTOM_ELEMENTS_SCHEMA needed.",
+    install: "npm i @lumi-icons/core @lumi-icons/angular", file: "launch.component.ts",
+    code: `import { Component } from "@angular/core";
+import { LumiIconComponent } from "@lumi-icons/angular";
+
+@Component({
+  selector: "app-launch",
+  imports: [LumiIconComponent],
+  template: \`<lumi-icon name="rocket" [size]="48" animation="launch" />\`,
+})
+export class LaunchComponent {}`,
+  },
+  {
+    id: "react-native", name: "React Native", icon: "phone", color: "#0e9fc7",
+    note: "A native renderer: the same icons drawn with react-native-svg, animated on the UI thread. Follows the OS reduce-motion setting.",
+    install: "npm i @lumi-icons/core @lumi-icons/react-native react-native-svg", file: "Launch.tsx",
+    code: `import { LumiIcon } from "@lumi-icons/react-native";
+
+export function Launch() {
+  return <LumiIcon name="rocket" size={48} color="#6a4dd8" animation="launch" />;
+}`,
+  },
+  {
+    id: "svelte", name: "Svelte & more", icon: "flame", color: "#ff3e00",
+    note: "Svelte, Solid, Lit, Astro, and any other framework that renders custom elements use the Web Component directly.",
+    install: "npm i @lumi-icons/core", file: "Launch.svelte",
+    code: `<script>
+  import "@lumi-icons/core";
+</script>
+
+<lumi-icon name="rocket" size="48" animation="launch"></lumi-icon>`,
+  },
+];
+
+const platformTabs = $("[data-platform-tabs]");
+const platformPanel = $("[data-platform-panel]");
+let activePlatform = platforms[0];
+
+const platformTabButtons = platforms.map((platform) => {
+  const tab = el("button", { className: "platform-tab", type: "button", id: `platform-tab-${platform.id}` }, { role: "tab", "aria-controls": "platform-panel" });
+  tab.style.setProperty("--platform", platform.color);
+  tab.append(icon(platform.icon, 22), el("span", { textContent: platform.name }));
+  tab.addEventListener("click", () => selectPlatform(platform));
+  platformTabs.append(tab);
+  return tab;
+});
+platformPanel.id = "platform-panel";
+
+// Arrow keys move between tabs, per the ARIA tabs pattern.
+platformTabs.addEventListener("keydown", (event) => {
+  const index = platforms.indexOf(activePlatform);
+  const next = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: platforms.length - 1 }[event.key];
+  if (next === undefined) return;
+  event.preventDefault();
+  selectPlatform(platforms[(next + platforms.length) % platforms.length], { focus: true });
+});
+
+function selectPlatform(platform: Platform, { focus = false } = {}) {
+  activePlatform = platform;
+  platformTabButtons.forEach((tab, index) => {
+    const selected = platforms[index] === platform;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    if (selected && focus) tab.focus();
+  });
+  platformPanel.setAttribute("aria-labelledby", `platform-tab-${platform.id}`);
+  platformPanel.style.setProperty("--platform", platform.color);
+  $("[data-platform-note]").textContent = platform.note;
+  $("[data-platform-install-text]").textContent = platform.install;
+  $("[data-platform-file]").textContent = platform.file;
+  $("[data-platform-code]").textContent = platform.code;
+}
+$("[data-platform-install]").addEventListener("click", () => copy(activePlatform.install, "install command"));
+$("[data-platform-copy]").addEventListener("click", () => copy(activePlatform.code, `${activePlatform.name} example`));
+selectPlatform(activePlatform);
+
+// "Works with" chips in the hero jump to that platform's tab.
+const platformChips = $("[data-platform-chips]");
+for (const platform of platforms) {
+  const link = el("a", { className: "platform-chip", href: "#usage" });
+  link.style.setProperty("--platform", platform.color);
+  link.append(icon(platform.icon, 18), el("span", { textContent: platform.name }));
+  link.addEventListener("click", () => selectPlatform(platform));
+  const item = el("li");
+  item.append(link);
+  platformChips.append(item);
+}
+
+/* ---------- Hero light table ---------- */
+
+// 32 tiles around the 2×2 logo in a 6×6 grid.
+const heroIcons: IconName[] = [
+  "rocket", "heart", "star", "bell", "camera", "palette",
+  "compass", "wand", "bulb", "trophy", "chat", "globe",
+  "sparkles", "music", "gem", "pizza",
+  "gamepad", "zap", "cloudSun", "leaf",
+  "bot", "crown", "headphones", "mail", "cart", "flame",
+  "calendar", "lock", "folder", "chart", "coffee", "gift",
+];
+// Icons that have a motion that suits them; the rest float.
+const heroMotion: Partial<Record<IconName, IconAnimation>> = {
+  rocket: "launch", bell: "ring", heart: "pulse", star: "sparkle", sparkles: "sparkle", gem: "sparkle",
+  compass: "tilt", globe: "spin", zap: "pulse", trophy: "tilt", crown: "sparkle", flame: "pulse",
+};
+const heroColors = swatches.slice(0, 6).map((swatch) => swatch.color);
+
+const hero = $("[data-hero]");
+const heroGrid = $("[data-hero-grid]");
+const heroHint = $("[data-hero-hint]");
+const heroTiles = heroIcons.map((name) => {
+  const tile = el("button", { className: "hero-tile", type: "button", tabIndex: -1, title: byName(name).label });
+  const glyph = icon(name);
+  tile.append(glyph);
+  // The stage is aria-hidden, so focus should not be sent back into it when the drawer closes.
+  tile.addEventListener("click", () => { returnFocus = null; openDrawer(name); });
+  heroGrid.append(tile);
+  return { tile, glyph, name, x: 0, y: 0, lit: -1, moving: false };
+});
+
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+const light = { x: 0, y: 0, targetX: 0, targetY: 0, radius: 0 };
+let pointer: { x: number; y: number } | null = null;
+let heroVisible = true;
+let frame = 0;
+
+// Tile centers in grid pixels. offsetLeft/Top ignore the lift transform, so lit tiles don't shift their own center.
+function measureHero() {
+  const cell = heroGrid.clientWidth / 6;
+  for (const tile of heroTiles) {
+    tile.x = tile.tile.offsetLeft + tile.tile.offsetWidth / 2;
+    tile.y = tile.tile.offsetTop + tile.tile.offsetHeight / 2;
+    // Colors run diagonally (+1 per column, +2 per row), so no two neighbours share one.
+    const column = Math.floor(tile.x / cell);
+    const row = Math.floor(tile.y / cell);
+    tile.tile.style.setProperty("--tile-color", heroColors[(column + row * 2) % heroColors.length]);
+  }
+  light.radius = heroGrid.clientWidth * 0.42;
+}
+
+function renderHero() {
+  hero.style.setProperty("--lx", `${heroGrid.offsetLeft + light.x}px`);
+  hero.style.setProperty("--ly", `${heroGrid.offsetTop + light.y}px`);
+  for (const tile of heroTiles) {
+    const raw = Math.max(0, 1 - Math.hypot(tile.x - light.x, tile.y - light.y) / light.radius);
+    const lit = raw * raw * (3 - 2 * raw); // smoothstep: a soft edge to the beam
+    if (Math.abs(lit - tile.lit) > 0.005) {
+      tile.lit = lit;
+      tile.tile.style.setProperty("--lit", lit.toFixed(3));
+    }
+    // Only touch the animation attribute when it changes, not every frame.
+    const moving = lit > 0.55 && !motionQuery.matches;
+    if (moving !== tile.moving) {
+      tile.moving = moving;
+      if (moving) tile.glyph.setAttribute("animation", heroMotion[tile.name] ?? "float");
+      else tile.glyph.removeAttribute("animation");
+    }
+  }
+}
+
+function tick(time: number) {
+  frame = 0;
+  if (!pointer) {
+    // Idle: the beam wanders on a slow Lissajous path.
+    const w = heroGrid.clientWidth;
+    const h = heroGrid.clientHeight;
+    light.targetX = w * (0.5 + 0.38 * Math.sin(time * 0.00042));
+    light.targetY = h * (0.5 + 0.36 * Math.sin(time * 0.00067 + 1.2));
+  }
+  light.x += (light.targetX - light.x) * 0.08;
+  light.y += (light.targetY - light.y) * 0.08;
+  renderHero();
+  if (heroVisible && !document.hidden) frame = requestAnimationFrame(tick);
+}
+
+function startHero() {
+  if (motionQuery.matches) {
+    // Still mode: no wandering or easing. The light sits where it was put.
+    cancelAnimationFrame(frame);
+    frame = 0;
+    light.x = light.targetX;
+    light.y = light.targetY;
+    renderHero();
+    return;
+  }
+  if (!frame && heroVisible && !document.hidden) frame = requestAnimationFrame(tick);
+}
+
+function pointAt(event: PointerEvent) {
+  const rect = heroGrid.getBoundingClientRect();
+  pointer = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  light.targetX = pointer.x;
+  light.targetY = pointer.y;
+  heroHint.classList.add("hidden");
+  startHero();
+}
+hero.addEventListener("pointermove", pointAt);
+hero.addEventListener("pointerdown", pointAt);
+hero.addEventListener("pointerleave", () => { pointer = null; startHero(); });
+
+new ResizeObserver(() => { measureHero(); startHero(); }).observe(heroGrid);
+new IntersectionObserver(([entry]) => { heroVisible = entry.isIntersecting; startHero(); }).observe(hero);
+document.addEventListener("visibilitychange", startHero);
+motionQuery.addEventListener("change", startHero);
+
+measureHero();
+light.x = light.targetX = heroGrid.clientWidth / 2;
+light.y = light.targetY = heroGrid.clientHeight * 0.3;
+heroHint.textContent = matchMedia("(hover: hover)").matches ? "Move your cursor to light them up" : "Tap an icon to explore it";
+startHero();

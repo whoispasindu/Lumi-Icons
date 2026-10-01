@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "main": "../dist/core/catalog.js",
+  "types": "../dist/core/catalog.d.ts"
+}

@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#f6f6fb" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f0e15" media="(prefers-color-scheme: dark)" />
     <title>Lumi Icons</title>
+    <link rel="icon" type="image/svg+xml" href="/brand/logo.svg" />
     <script>
       // Apply the saved theme before first paint to avoid a flash.
       try { const t = localStorage.getItem("lumi-theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
@@ -18,8 +19,18 @@
     <header class="site-header">
       <div class="container header-inner">
         <a class="wordmark" href="#top" aria-label="Lumi Icons home">
-          <lumi-icon name="cube" size="26"></lumi-icon>
-          <span>Lumi <b>Icons</b></span>
+          <img src="/brand/logo.svg" width="32" height="32" alt="" />
+          <!-- Inline wordmark (same paths as brand/logo-lockup-*.svg) so it follows the page theme. -->
+          <svg class="wordmark-text" viewBox="80 10 198 38" aria-hidden="true">
+            <g fill="none" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+              <path class="wm-lumi" d="M84 14v30M96 26v9a7 7 0 0 0 14 0v-9m0 0v18M122 44V26m0 6.5a6.5 6.5 0 0 1 13 0V44m0-11.5a6.5 6.5 0 0 1 13 0V44M160 26v18"/>
+              <path class="wm-icons" d="M180 26v18M203.5 29.6a7 7 0 1 0 0 10.8"/>
+              <circle class="wm-icons" cx="218" cy="35" r="7"/>
+              <path class="wm-icons" d="M237 44V26m0 7a7 7 0 0 1 14 0v11M273 28.8c-1.2-1.6-3-2.5-5.2-2.5-3 0-5.3 1.7-5.3 4.1 0 5.7 11 2.9 11 8.7 0 2.5-2.4 4.4-5.7 4.4-2.4 0-4.5-1-5.8-2.8"/>
+            </g>
+            <circle class="wm-lumi-dot" cx="160" cy="16.5" r="3.4"/>
+            <circle class="wm-icons-dot" cx="180" cy="16.5" r="3.4"/>
+          </svg>
         </a>
         <nav class="nav" aria-label="Primary">
           <a href="#icons">Icons</a>
@@ -37,7 +48,7 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="dot"></span>Open source · MIT · Zero dependencies</p>
           <h1>Icons with depth that move with your interface.</h1>
-          <p class="lede"><span data-icon-count>427</span> animated 3D icons in one tiny Web Component. Theme them with a single color, drop them into HTML, React, or Vue, and they respect reduced-motion out of the box.</p>
+          <p class="lede"><span data-icon-count>828</span> animated 3D icons for the web and mobile. Theme them with a single color, use them anywhere from plain HTML to React Native, and they respect reduced-motion out of the box.</p>
           <div class="hero-actions">
             <a class="button primary" href="#icons">Browse icons <lumi-icon name="arrowRight" size="18"></lumi-icon></a>
             <button class="install" type="button" data-copy="npm i @lumi-icons/core" aria-label="Copy install command">
@@ -46,20 +57,23 @@
             </button>
           </div>
           <dl class="stats">
-            <div><dt>Icons</dt><dd data-icon-count>427</dd></div>
+            <div><dt>Icons</dt><dd data-icon-count>828</dd></div>
             <div><dt>Categories</dt><dd data-category-count>23</dd></div>
             <div><dt>Motions</dt><dd>7</dd></div>
-            <div><dt>Gzipped</dt><dd>~29 KB</dd></div>
+            <div><dt>20 icons, gzipped</dt><dd>~5 KB</dd></div>
           </dl>
+          <div class="platforms">
+            <span class="platforms-label">Works with</span>
+            <ul class="platform-chips" data-platform-chips></ul>
+          </div>
         </div>
-        <div class="hero-stage" aria-hidden="true">
-          <lumi-icon class="float-a" name="rocket" size="132" color="#6a4dd8" animation="launch"></lumi-icon>
-          <lumi-icon class="float-b" name="bell" size="76" color="#ef6b4a" animation="ring"></lumi-icon>
-          <lumi-icon class="float-c" name="heart" size="64" color="#e2458a" animation="pulse"></lumi-icon>
-          <lumi-icon class="float-d" name="settings" size="70" color="#10a37f" animation="spin"></lumi-icon>
-          <lumi-icon class="float-e" name="star" size="58" color="#e9a23b" animation="sparkle"></lumi-icon>
-          <lumi-icon class="float-f" name="cube" size="84" color="#2f7de1" animation="tilt"></lumi-icon>
-          <lumi-icon class="float-g" name="chat" size="56" color="#6a4dd8" animation="float"></lumi-icon>
+        <!-- A light table: a beam drifts across dim icons and lights them up; the cursor can steer it.
+             Decorative for assistive tech (the catalog below is the accessible way in). -->
+        <div class="hero-stage" data-hero aria-hidden="true">
+          <div class="hero-grid" data-hero-grid>
+            <div class="hero-logo"><img src="/brand/logo.svg" alt="" width="64" height="64" /></div>
+          </div>
+          <p class="hero-hint" data-hero-hint></p>
         </div>
       </section>
 
@@ -138,7 +152,7 @@
               <header class="group-head">
                 <div>
                   <h2 id="categories-title">Browse by category</h2>
-                  <p><span data-icon-count>427</span> icons in <span data-category-count>23</span> categories.</p>
+                  <p><span data-icon-count>828</span> icons in <span data-category-count>23</span> categories.</p>
                 </div>
                 <button class="button ghost small" type="button" data-toggle-all>Expand all</button>
               </header>
@@ -165,31 +179,42 @@
 
       <section class="usage container" id="usage" aria-labelledby="usage-title">
         <p class="eyebrow">Usage</p>
-        <h2 id="usage-title">One element, every framework.</h2>
-        <div class="usage-grid">
-          <article class="usage-card">
-            <h3><lumi-icon name="globe" size="22"></lumi-icon> HTML / CDN</h3>
-            <pre><code>&lt;script type="module"
-  src="https://cdn.jsdelivr.net/npm/@lumi-icons/core/+esm"&gt;&lt;/script&gt;
+        <h2 id="usage-title">One icon set, every platform.</h2>
+        <p class="usage-lede">The same icons, names, and motions everywhere: a Web Component on the web, typed components for each framework, and a native renderer for React Native.</p>
+        <div class="platform-tabs" role="tablist" aria-label="Platform" data-platform-tabs></div>
+        <div class="platform-panel" role="tabpanel" data-platform-panel>
+          <div class="platform-meta">
+            <p data-platform-note></p>
+            <button class="install" type="button" data-platform-install aria-label="Copy install command">
+              <code><span class="prompt">$</span> <span data-platform-install-text></span></code>
+              <lumi-icon name="copy" size="18"></lumi-icon>
+            </button>
+          </div>
+          <div class="code-card">
+            <div class="code-tabs">
+              <span class="code-file" data-platform-file></span>
+              <button class="copy" type="button" data-platform-copy><lumi-icon name="copy" size="16"></lumi-icon><span>Copy</span></button>
+            </div>
+            <pre><code data-platform-code></code></pre>
+          </div>
+        </div>
+        <div class="lean-card">
+          <div class="lean-copy">
+            <h3><lumi-icon name="package" size="22"></lumi-icon> Ship only the icons you use</h3>
+            <p>The default import registers every icon, so any name just works. For production apps, import the element and just the icons you need: bundlers drop everything else.</p>
+            <dl class="lean-stats">
+              <div><dt>20 icons</dt><dd data-size-lean>~5 KB</dd></div>
+              <div><dt>All icons</dt><dd data-size-full>~58 KB</dd></div>
+            </dl>
+            <p class="lean-note">Framework packages have the same split: <code>@lumi-icons/react/lean</code>, <code>/vue/lean</code>, <code>/angular/lean</code>, <code>/react-native/lean</code>, plus an <code>icon</code> prop.</p>
+          </div>
+          <pre><code>import { registerIcons } from "@lumi-icons/core/element";
+import { rocketIcon, heartIcon } from "@lumi-icons/core/icons";
 
-&lt;lumi-icon name="rocket" animation="launch"&gt;&lt;/lumi-icon&gt;</code></pre>
-          </article>
-          <article class="usage-card">
-            <h3><lumi-icon name="code" size="22"></lumi-icon> React</h3>
-            <pre><code>npm i @lumi-icons/core @lumi-icons/react
+registerIcons(rocketIcon, heartIcon);
 
-import { LumiIcon } from "@lumi-icons/react";
-
-&lt;LumiIcon name="rocket" size={40} /&gt;</code></pre>
-          </article>
-          <article class="usage-card">
-            <h3><lumi-icon name="leaf" size="22"></lumi-icon> Vue</h3>
-            <pre><code>npm i @lumi-icons/core @lumi-icons/vue
-
-import { LumiIcon } from "@lumi-icons/vue";
-
-&lt;LumiIcon name="rocket" :size="40" /&gt;</code></pre>
-          </article>
+// &lt;lumi-icon name="rocket"&gt;&lt;/lumi-icon&gt; now works,
+// and only these two icons are in your bundle.</code></pre>
         </div>
         <div class="api">
           <table>
@@ -257,10 +282,17 @@ import { LumiIcon } from "@lumi-icons/vue";
             <button type="button" role="tab" data-tab="html">HTML</button>
             <button type="button" role="tab" data-tab="react">React</button>
             <button type="button" role="tab" data-tab="vue">Vue</button>
+            <button type="button" role="tab" data-tab="angular">Angular</button>
+            <button type="button" role="tab" data-tab="react-native" title="React Native">RN</button>
             <button class="copy" type="button" data-copy-code>
               <lumi-icon name="copy" size="16"></lumi-icon><span>Copy</span>
             </button>
           </div>
+          <label class="lean-toggle">
+            <input type="checkbox" data-lean />
+            <span class="track"><span class="thumb"></span></span>
+            <span>Only this icon <small>(tree-shaken import)</small></span>
+          </label>
           <pre role="tabpanel"><code data-code></code></pre>
         </div>
       </div>

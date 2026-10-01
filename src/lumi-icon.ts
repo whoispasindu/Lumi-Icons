@@ -1,5 +1,5 @@
-import { icons } from "./icons.js";
-import { iconAliases, type IconAlias, type IconName } from "./types.js";
+import { getIcon, onIconsChange, registerIcons } from "./registry.js";
+import type { IconAlias, IconDefinition, IconName } from "./types.js";
 
 export const tagName = "lumi-icon";
 
@@ -44,13 +44,6 @@ function getSharedSheet() {
   return sharedSheet;
 }
 
-export function resolveIconName(name: string | null): IconName | undefined {
-  if (!name) return undefined;
-  if (Object.hasOwn(icons, name)) return name as IconName;
-  if (Object.hasOwn(iconAliases, name)) return iconAliases[name as IconAlias];
-  return undefined;
-}
-
 const lengthPattern = /^(\d*\.?\d+)(px|em|rem|%|ch|ex|lh|vw|vh|vmin|vmax|pt|cqw|cqh)?$/;
 
 /** A bare number is read as pixels; a number with a CSS unit ("2em", "1.5rem") is used as is. */
@@ -62,6 +55,70 @@ function toCssLength(value: string | null) {
 
 const warnedNames = new Set<string>();
 
+/** "rocket" → "rocketIcon", the icon's export name in @lumi-icons/core/icons. */
+const exportName = (name: string) => `${name.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())}Icon`;
+
+// Icons may be registered after an element connects (e.g. a later registerIcons call), so an unknown
+// name is only reported if it is still unknown once the current task has finished.
+function warnIfStillMissing(name: string) {
+  if (warnedNames.has(name)) return;
+  setTimeout(() => {
+    if (getIcon(name) || warnedNames.has(name)) return;
+    warnedNames.add(name);
+    console.warn(
+      `<${tagName}>: no icon named "${name}" is registered. Import "@lumi-icons/core" to register every icon, ` +
+      `or register just this one: registerIcons(${exportName(name)}) with ${exportName(name)} from "@lumi-icons/core/icons".`,
+    );
+  }, 0);
+}
+
+// Sites that enforce Trusted Types (CSP `require-trusted-types-for 'script'`) reject plain strings in
+// innerHTML. Icon markup goes through a "lumi-icons" policy instead; such sites allow it with
+// `trusted-types lumi-icons`. The policy is kept on a global symbol so a second copy of this package
+// reuses it rather than failing to create a duplicate.
+interface HtmlPolicy { createHTML(markup: string): unknown }
+type PolicyFactory = { createPolicy(name: string, rules: { createHTML(markup: string): string }): HtmlPolicy };
+const policyKey = Symbol.for("lumi-icons.trusted-types-policy.v1");
+function trustedHTML(markup: string): string {
+  const global = globalThis as { trustedTypes?: PolicyFactory; [policyKey]?: HtmlPolicy | null };
+  if (global[policyKey] === undefined) {
+    try {
+      global[policyKey] = global.trustedTypes?.createPolicy("lumi-icons", { createHTML: (input) => input }) ?? null;
+    } catch {
+      global[policyKey] = null; // The page's CSP does not allow the "lumi-icons" policy.
+    }
+  }
+  const policy = global[policyKey];
+  return (policy ? policy.createHTML(markup) : markup) as string;
+}
+
+// Parsing markup is the main cost of showing many icons, so each icon is parsed once into a template
+// and every element after that clones the parsed nodes.
+const parsedIcons = new WeakMap<IconDefinition<string>, HTMLTemplateElement>();
+function iconNodes(definition: IconDefinition<string>, into: Document) {
+  let template = parsedIcons.get(definition);
+  if (!template) {
+    template = document.createElement("template");
+    template.innerHTML = trustedHTML(definition.svg);
+    parsedIcons.set(definition, template);
+  }
+  return into.importNode(template.content, true);
+}
+
+let reportedDrawError = false;
+function reportDrawError(name: string, error: unknown) {
+  if (reportedDrawError) return;
+  reportedDrawError = true;
+  console.error(
+    `<${tagName}>: could not draw "${name}". If this page's Content-Security-Policy enforces Trusted Types, ` +
+    `allow the icon policy with "trusted-types lumi-icons".`, error,
+  );
+}
+
+const isIconDefinition = (value: unknown): value is IconDefinition<string> =>
+  typeof value === "object" && value !== null && typeof (value as IconDefinition<string>).name === "string" &&
+  (value as IconDefinition<string>).name !== "";
+
 // Lets the module load where HTMLElement does not exist (Node, SSR); the element only
 // becomes functional once defined in a browser.
 const BaseElement = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as typeof HTMLElement;
@@ -70,7 +127,8 @@ export class LumiIcon extends BaseElement {
   static observedAttributes = ["name", "size", "color", "label"];
 
   #icon: HTMLSpanElement;
-  #renderedName: IconName | undefined;
+  #rendered: IconDefinition<string> | undefined;
+  #unsubscribe: (() => void) | undefined;
 
   constructor() {
     super();
@@ -89,23 +147,56 @@ export class LumiIcon extends BaseElement {
     root.append(this.#icon);
   }
 
-  connectedCallback() { this.#update(); }
+  connectedCallback() {
+    // A framework or script may set these properties before the element was defined; those values were
+    // stored on the instance and hide the class's setters, so re-apply them through the setters.
+    this.#upgradeProperty("icon");
+    this.#upgradeProperty("name");
+    this.#unsubscribe ??= onIconsChange(() => this.#update());
+    this.#update();
+  }
+  disconnectedCallback() {
+    this.#unsubscribe?.();
+    this.#unsubscribe = undefined;
+  }
   attributeChangedCallback() { this.#update(); }
 
   get name(): string { return this.getAttribute("name") ?? ""; }
   set name(value: IconName | IconAlias | (string & {})) { this.setAttribute("name", value); }
 
+  /** The icon currently drawn. Setting an icon definition registers it and shows it; null or undefined clears it. */
+  get icon(): IconDefinition<string> | undefined { return this.#rendered; }
+  set icon(definition: IconDefinition<string> | null | undefined) {
+    if (isIconDefinition(definition)) {
+      registerIcons(definition);
+      this.setAttribute("name", definition.name);
+    } else {
+      this.removeAttribute("name");
+    }
+  }
+
+  #upgradeProperty(property: "icon" | "name") {
+    if (!Object.prototype.hasOwnProperty.call(this, property)) return;
+    const value = (this as Record<typeof property, unknown>)[property];
+    delete (this as Partial<Record<typeof property, unknown>>)[property];
+    (this as Record<typeof property, unknown>)[property] = value;
+  }
+
   #update() {
     const requested = this.getAttribute("name");
-    const name = resolveIconName(requested);
-    if (!name && requested && !warnedNames.has(requested)) {
-      warnedNames.add(requested);
-      console.warn(`<${tagName}>: unknown icon name "${requested}".`);
-    }
-    // Icon SVG is package-owned markup, never user input; only swap it when the name changes.
-    if (name !== this.#renderedName) {
-      this.#icon.innerHTML = name ? icons[name].svg : "";
-      this.#renderedName = name;
+    const definition = getIcon(requested);
+    if (!definition && requested) warnIfStillMissing(requested);
+    // Icon SVG is registered artwork, never attribute input; only swap it when the icon changes.
+    if (definition !== this.#rendered) {
+      this.#rendered = definition;
+      this.#icon.replaceChildren();
+      if (definition) {
+        try {
+          this.#icon.append(iconNodes(definition, this.ownerDocument));
+        } catch (error) {
+          reportDrawError(definition.name, error);
+        }
+      }
     }
 
     // Attribute values go through the CSSOM and setAttribute, never into markup, so they cannot inject HTML or CSS.

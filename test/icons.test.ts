@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { icons } from "../src/icons";
-import { iconAliases, iconCategories, iconNames } from "../src/types";
+import { iconNames, icons } from "../src/icons";
+import { iconAliases, iconCategories } from "../src/types";
 
 describe("icon catalog", () => {
   it("defines every name exactly once", () => {

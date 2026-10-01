@@ -7,7 +7,9 @@
     "strict": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    // Type-check against core's source, so `check` works before anything is built (as in CI).
+    "paths": { "@lumi-icons/core": ["./src/index.ts"] }
   },
-  "include": ["src", "playground", "test"]
+  "include": ["src", "playground", "test", "test-dist"]
 }

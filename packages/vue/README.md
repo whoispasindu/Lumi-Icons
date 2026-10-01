@@ -14,6 +14,23 @@ import { LumiIcon } from "@lumi-icons/vue";
 </template>
 ```
 
-Props: `name`, `size` (number of pixels or CSS length), `color`, `animation`, `motion`, `label`. Other attributes are passed through to the `<lumi-icon>` element.
+Props: `name` (or `icon`), `size` (number of pixels or CSS length), `color`, `animation`, `motion`, `label`. Other attributes are passed through to the `<lumi-icon>` element.
 
 This wrapper delegates icon registration, SVG rendering, and motion to `@lumi-icons/core`, and is safe to import during server-side rendering.
+
+## Smaller bundles
+
+`@lumi-icons/vue` registers all icons so any `name` works. To ship only the icons you use, import from `/lean` and pass icon objects:
+
+```vue
+<script setup lang="ts">
+import { LumiIcon } from "@lumi-icons/vue/lean";
+import { rocketIcon } from "@lumi-icons/core/icons";
+</script>
+
+<template>
+  <LumiIcon :icon="rocketIcon" :size="32" animation="launch" />
+</template>
+```
+
+`registerIcons` is re-exported from `/lean` for icons you want to use by name.

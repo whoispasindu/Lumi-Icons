@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import "../src/index";
+import { registerIcons } from "../src/index";
 import { icons } from "../src/icons";
 import type { LumiIcon } from "../src/lumi-icon";
 
@@ -38,13 +38,41 @@ describe("<lumi-icon>", () => {
     expect(inner(mount({ name: "x" })).innerHTML).toBe(parsed(icons.close.svg));
   });
 
-  it("renders nothing and warns once for an unknown name", () => {
+  it("renders nothing and warns once, after the current task, for an unknown name", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const element = mount({ name: "not-an-icon" });
     mount({ name: "not-an-icon" });
     expect(inner(element).innerHTML).toBe("");
+    expect(warn).not.toHaveBeenCalled(); // deferred: the icon could still be registered
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain("notAnIconIcon"); // points at the export to import
     warn.mockRestore();
+  });
+
+  it("does not warn when the icon is registered later in the same task", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const element = mount({ name: "late-icon" });
+    expect(inner(element).innerHTML).toBe("");
+    registerIcons({ ...icons.star, name: "late-icon" });
+    expect(inner(element).innerHTML).toBe(parsed(icons.star.svg)); // re-rendered on registration
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("renders a custom registered icon", () => {
+    const custom = { name: "brand-mark", label: "Brand", category: "objects", tags: [], svg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg>' } as const;
+    registerIcons(custom);
+    expect(inner(mount({ name: "brand-mark" })).querySelector("circle")).not.toBeNull();
+  });
+
+  it("accepts an icon definition through the icon property", () => {
+    const element = mount({});
+    element.icon = icons.trophy;
+    expect(element.getAttribute("name")).toBe("trophy");
+    expect(inner(element).innerHTML).toBe(parsed(icons.trophy.svg));
+    expect(element.icon).toBe(icons.trophy);
   });
 
   it("does not treat Object.prototype keys as icon names", () => {
