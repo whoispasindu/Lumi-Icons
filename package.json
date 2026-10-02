@@ -52,6 +52,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "demo": "tsc -p tsconfig.build.json && vite demo",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "build:core": "tsc -p tsconfig.build.json",

@@ -183,6 +183,7 @@ This repo uses [pnpm](https://pnpm.io) workspaces.
 ```bash
 pnpm install
 pnpm dev              # playground at http://localhost:5173
+pnpm demo             # demo + in-browser health check at http://localhost:5174 (add --host to open it on a phone)
 pnpm test             # unit tests
 pnpm build            # type-check, build core to dist/core, build the playground
 pnpm test:dist        # bundle-size and tree-shaking checks on dist (after pnpm build)

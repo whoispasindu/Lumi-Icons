@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumi Icons Demo</title>
+    <link rel="icon" type="image/svg+xml" data-favicon />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap top-row">
+        <a class="brand" href="#top" aria-label="Lumi Icons demo">
+          <img data-logo alt="" width="28" height="28" />
+          <span>Lumi Icons <small>demo</small></span>
+        </a>
+        <nav class="top-nav" aria-label="Sections">
+          <a href="#health">Health check</a>
+          <a href="#showcase">Showcase</a>
+          <a href="#all">All icons</a>
+        </nav>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle dark mode">
+          <lumi-icon name="moon" size="20"></lumi-icon>
+        </button>
+      </div>
+    </header>
+
+    <main id="top" class="wrap">
+      <section class="intro">
+        <h1>Do the icons work in this browser?</h1>
+        <p>
+          This page loads the built package (<code>dist/core</code>, exactly what npm users install) and tests it
+          right here. Open it in every browser and device you want to support.
+        </p>
+        <p class="meta" data-meta></p>
+      </section>
+
+      <section id="health" class="card" aria-labelledby="health-title">
+        <div class="card-head">
+          <div>
+            <h2 id="health-title">Health check</h2>
+            <p class="summary" data-summary role="status">Running checks…</p>
+          </div>
+          <div class="card-actions">
+            <button class="button" type="button" data-rerun>Run again</button>
+            <button class="button primary" type="button" data-copy-report>Copy report</button>
+          </div>
+        </div>
+        <ul class="checks" data-checks></ul>
+        <div class="features" data-features aria-label="Browser features"></div>
+      </section>
+
+      <section id="showcase" aria-labelledby="showcase-title">
+        <h2 id="showcase-title">Showcase</h2>
+        <div class="showcase">
+          <figure class="card">
+            <figcaption>Animations</figcaption>
+            <div class="row" data-animations></div>
+          </figure>
+          <figure class="card">
+            <figcaption>Sizes</figcaption>
+            <div class="row sizes" data-sizes></div>
+          </figure>
+          <figure class="card">
+            <figcaption>Colors (every shade comes from one color)</figcaption>
+            <div class="row" data-colors></div>
+          </figure>
+        </div>
+      </section>
+
+      <section id="all" aria-labelledby="all-title">
+        <div class="all-head">
+          <h2 id="all-title">All icons <span class="count" data-count></span></h2>
+          <p class="hint">Click an icon to copy its HTML.</p>
+        </div>
+        <div class="toolbar card">
+          <label class="search">
+            <lumi-icon name="search" size="18"></lumi-icon>
+            <input type="search" placeholder="Search by name or tag" data-search aria-label="Search icons" />
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <select data-category><option value="">All</option></select>
+          </label>
+          <label class="field">
+            <span>Animation</span>
+            <select data-animation></select>
+          </label>
+          <label class="field">
+            <span>Size <output data-size-out>32</output></span>
+            <input type="range" min="16" max="64" step="4" value="32" data-size />
+          </label>
+          <label class="field color">
+            <span>Color</span>
+            <input type="color" value="#6a4dd8" data-color />
+          </label>
+        </div>
+        <ul class="grid" data-grid></ul>
+        <p class="empty" data-empty hidden>No icons match your search.</p>
+      </section>
+    </main>
+
+    <footer class="wrap footer">Lumi Icons · MIT</footer>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+    <!-- Off-screen, but laid out, so the health check can measure real rendering. -->
+    <div class="sandbox" data-sandbox aria-hidden="true"></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
