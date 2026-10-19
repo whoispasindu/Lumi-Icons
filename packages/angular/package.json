@@ -44,6 +44,7 @@
     "./fesm2022/lumi-icons-angular.mjs"
   ],
   "publishConfig": {
+    "access": "public",
     "directory": "dist"
   }
 }
